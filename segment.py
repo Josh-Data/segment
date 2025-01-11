@@ -136,6 +136,14 @@ df_full, scaler, conts, df_scaled = preprocess_data(df_raw)
 # Show elbow plot
 st.subheader("Elbow Plot for Optimal Clusters")
 st.write("Defining how many clusters to choose can be a bit more art than science. The elbow plot compares the number of segments and model inertia.")
+plot_elbow(df_scaled)  # Pass df_scaled instead of df_full
+
+# In the main section, modify the code to:
+df_full, scaler, conts, df_scaled = preprocess_data(df_raw)
+
+# Show elbow plot
+st.subheader("Elbow Plot for Optimal Clusters")
+st.write("Defining how many clusters to choose can be a bit more art than science. The elbow plot compares the number of segments and model inertia.")
 plot_elbow(df_scaled)  
 
 # Heatmap
