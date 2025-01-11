@@ -32,19 +32,47 @@ st.dataframe(df_raw.head())
 
 # Data preprocessing
 def preprocess_data(df):
-    # Drop unnecessary columns
-    df = df.drop(columns=["Geography_Spain", "Geography_Germany", "Satisfaction Score",
-                         "Card Type_PLATINUM", "Card Type_SILVER", "Card Type_GOLD", 
-                         "IsActiveMember"])
+    # First, drop the basic unnecessary columns
+    columns_to_drop = ['RowNumber', 'CustomerId', 'Surname']
+    df = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
+    
+    # Convert categorical variables to binary
+    if 'Geography' in df.columns:
+        df = pd.get_dummies(df, columns=['Geography'], prefix=['Geography'])
+    if 'Gender' in df.columns:
+        df = pd.get_dummies(df, columns=['Gender'], prefix=['Gender'])
+    if 'Card Type' in df.columns:
+        df = pd.get_dummies(df, columns=['Card Type'], prefix=['Card_Type'])
+    
+    # Drop one category from each binary variable to avoid multicollinearity
+    binary_cols_to_drop = []
+    if 'Geography_Spain' in df.columns:
+        binary_cols_to_drop.append('Geography_Spain')
+    if 'Gender_Female' in df.columns:
+        binary_cols_to_drop.append('Gender_Female')
+    if 'Card_Type_Silver' in df.columns:
+        binary_cols_to_drop.append('Card_Type_Silver')
+    
+    df = df.drop(columns=[col for col in binary_cols_to_drop if col in df.columns])
+    
+    # Scale continuous variables
+    conts = ["CreditScore", "Age", "Tenure", "Balance", "NumOfProducts", 
+             "HasCrCard", "EstimatedSalary"]
+    
+    # Add 'Point Earned' if it exists
+    if 'Point Earned' in df.columns:
+        conts.append('Point Earned')
+    
+    # Separate continuous and binary variables
+    df_conts = df[conts]
+    df_binary = df.drop(columns=conts)
     
     # Scale continuous variables
     scaler = StandardScaler()
-    conts = ["CreditScore", "Age", "Tenure", "Balance", "NumOfProducts", 
-             "HasCrCard", "EstimatedSalary", "Point Earned"]
-    df_conts = df[conts]
-    df_binary = df.drop(columns=conts)
     df_scaled = scaler.fit_transform(df_conts)
     df_scaled = pd.DataFrame(df_scaled, columns=conts)
+    
+    # Combine scaled continuous and binary variables
     df_full = pd.concat([df_scaled, df_binary], axis=1)
     
     return df_full, scaler, conts
