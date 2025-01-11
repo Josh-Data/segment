@@ -78,19 +78,65 @@ def preprocess_data(df):
     return df_full, scaler, conts
 
 # Elbow plot
-def plot_elbow(df):
+def plot_elbow(df_scaled):  # Changed parameter to df_scaled
     clusters = range(1, 10)
     inertia = []
     for cluster in clusters:
         model = KMeans(n_clusters=cluster, random_state=42)
-        model.fit(df)
+        model.fit(df_scaled)  # Using df_scaled instead of df
         inertia.append(model.inertia_)
     
     fig, ax = plt.subplots()
     plt.plot(clusters, inertia, marker="o", color="black")
-    plt.title("Elbow Plot")
+    plt.title("Elbow")
     plt.grid()
+    
+    # Add axis labels and adjust scale
+    plt.xlabel("Number of Clusters")
+    plt.ylabel("Inertia")
+    # Format y-axis to show values in normal scale instead of scientific notation
+    plt.ticklabel_format(style='plain', axis='y')
+    
     st.pyplot(fig)
+
+# And modify the preprocessing function to match your code exactly:
+def preprocess_data(df):
+    # Drop initial columns
+    df = df.drop(columns=["RowNumber", "CustomerId", "Surname"])
+    
+    # Convert to dummies first time
+    df = pd.get_dummies(df, drop_first=True)
+    
+    # Drop specified columns
+    df = df.drop(columns=["Geography_Spain", "Geography_Germany", "Satisfaction Score",
+                         "Card Type_PLATINUM", "Card Type_SILVER", "Card Type_GOLD", 
+                         "IsActiveMember"])
+    
+    # Convert to dummies second time and convert to int
+    df = pd.get_dummies(df, drop_first=True).astype(int)
+    
+    # Scale continuous variables
+    conts = ["CreditScore", "Age", "Tenure", "Balance", "NumOfProducts", 
+             "HasCrCard", "EstimatedSalary", "Point Earned"]
+    df_conts = df[conts]
+    df_binary = df.drop(columns=conts)
+    
+    scaler = StandardScaler()
+    df_scaled = scaler.fit_transform(df_conts)
+    df_scaled = pd.DataFrame(df_scaled, columns=conts)
+    
+    # Combine scaled continuous and binary variables
+    df_full = pd.concat([df_scaled, df_binary], axis=1)
+    
+    return df_full, scaler, conts, df_scaled  # Added df_scaled to return values
+
+# In the main section, modify the code to:
+df_full, scaler, conts, df_scaled = preprocess_data(df_raw)
+
+# Show elbow plot
+st.subheader("Elbow Plot for Optimal Clusters")
+st.write("Defining how many clusters to choose can be a bit more art than science. The elbow plot compares the number of segments and model inertia.")
+plot_elbow(df_scaled)  
 
 # Heatmap
 def plot_heatmap(df_cluster):
