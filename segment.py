@@ -19,8 +19,12 @@ Once we have a segmentation, we achieve the following benefits:
 # Load and preprocess data
 @st.cache_data
 def load_data():
-    df_raw = pd.read_csv("df_raw.csv")
-    return df_raw
+    try:
+        df_raw = pd.read_csv("df_raw.csv")
+        return df_raw
+    except FileNotFoundError:
+        st.error("Error: df_raw.csv not found. Please make sure the file is in the correct location.")
+        return None
 
 # Load raw data
 df_raw = load_data()
@@ -30,76 +34,6 @@ st.subheader("Raw Data Preview")
 st.write("Here are the first few rows of the raw dataframe. We can see right away there are some irrelevant columns that we can drop such as RowNumber, CustomerID, and Surname.")
 st.dataframe(df_raw.head())
 
-# Data preprocessing
-def preprocess_data(df):
-    # First, drop the basic unnecessary columns
-    columns_to_drop = ['RowNumber', 'CustomerId', 'Surname']
-    df = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
-    
-    # Convert categorical variables to binary
-    if 'Geography' in df.columns:
-        df = pd.get_dummies(df, columns=['Geography'], prefix=['Geography'])
-    if 'Gender' in df.columns:
-        df = pd.get_dummies(df, columns=['Gender'], prefix=['Gender'])
-    if 'Card Type' in df.columns:
-        df = pd.get_dummies(df, columns=['Card Type'], prefix=['Card_Type'])
-    
-    # Drop one category from each binary variable to avoid multicollinearity
-    binary_cols_to_drop = []
-    if 'Geography_Spain' in df.columns:
-        binary_cols_to_drop.append('Geography_Spain')
-    if 'Gender_Female' in df.columns:
-        binary_cols_to_drop.append('Gender_Female')
-    if 'Card_Type_Silver' in df.columns:
-        binary_cols_to_drop.append('Card_Type_Silver')
-    
-    df = df.drop(columns=[col for col in binary_cols_to_drop if col in df.columns])
-    
-    # Scale continuous variables
-    conts = ["CreditScore", "Age", "Tenure", "Balance", "NumOfProducts", 
-             "HasCrCard", "EstimatedSalary"]
-    
-    # Add 'Point Earned' if it exists
-    if 'Point Earned' in df.columns:
-        conts.append('Point Earned')
-    
-    # Separate continuous and binary variables
-    df_conts = df[conts]
-    df_binary = df.drop(columns=conts)
-    
-    # Scale continuous variables
-    scaler = StandardScaler()
-    df_scaled = scaler.fit_transform(df_conts)
-    df_scaled = pd.DataFrame(df_scaled, columns=conts)
-    
-    # Combine scaled continuous and binary variables
-    df_full = pd.concat([df_scaled, df_binary], axis=1)
-    
-    return df_full, scaler, conts
-
-# Elbow plot
-def plot_elbow(df_scaled):  # Changed parameter to df_scaled
-    clusters = range(1, 10)
-    inertia = []
-    for cluster in clusters:
-        model = KMeans(n_clusters=cluster, random_state=42)
-        model.fit(df_scaled)  # Using df_scaled instead of df
-        inertia.append(model.inertia_)
-    
-    fig, ax = plt.subplots()
-    plt.plot(clusters, inertia, marker="o", color="black")
-    plt.title("Elbow")
-    plt.grid()
-    
-    # Add axis labels and adjust scale
-    plt.xlabel("Number of Clusters")
-    plt.ylabel("Inertia")
-    # Format y-axis to show values in normal scale instead of scientific notation
-    plt.ticklabel_format(style='plain', axis='y')
-    
-    st.pyplot(fig)
-
-# And modify the preprocessing function to match your code exactly:
 def preprocess_data(df):
     # Drop initial columns
     df = df.drop(columns=["RowNumber", "CustomerId", "Surname"])
@@ -128,23 +62,28 @@ def preprocess_data(df):
     # Combine scaled continuous and binary variables
     df_full = pd.concat([df_scaled, df_binary], axis=1)
     
-    return df_full, scaler, conts, df_scaled  # Added df_scaled to return values
+    return df_full, scaler, conts, df_scaled
 
-# In the main section, modify the code to:
-df_full, scaler, conts, df_scaled = preprocess_data(df_raw)
-
-# Show elbow plot
-st.subheader("Elbow Plot for Optimal Clusters")
-st.write("Defining how many clusters to choose can be a bit more art than science. The elbow plot compares the number of segments and model inertia.")
-plot_elbow(df_scaled)  # Pass df_scaled instead of df_full
-
-# In the main section, modify the code to:
-df_full, scaler, conts, df_scaled = preprocess_data(df_raw)
-
-# Show elbow plot
-st.subheader("Elbow Plot for Optimal Clusters")
-st.write("Defining how many clusters to choose can be a bit more art than science. The elbow plot compares the number of segments and model inertia.")
-plot_elbow(df_scaled)  
+# Elbow plot
+def plot_elbow(df_scaled):
+    clusters = range(1, 10)
+    inertia = []
+    for cluster in clusters:
+        model = KMeans(n_clusters=cluster, random_state=42)
+        model.fit(df_scaled)
+        inertia.append(model.inertia_)
+    
+    fig, ax = plt.subplots()
+    plt.plot(clusters, inertia, marker="o", color="black")
+    plt.title("Elbow")
+    plt.grid()
+    
+    # Add axis labels and adjust scale
+    plt.xlabel("Number of Clusters")
+    plt.ylabel("Inertia")
+    plt.ticklabel_format(style='plain', axis='y')
+    
+    st.pyplot(fig)
 
 # Heatmap
 def plot_heatmap(df_cluster):
@@ -192,7 +131,7 @@ def get_user_input(conts):
     return pd.DataFrame([user_input])
 
 # Main app logic
-df_full, scaler, conts = preprocess_data(df_raw)
+df_full, scaler, conts, df_scaled = preprocess_data(df_raw)
 
 # Train KMeans model
 model = KMeans(n_clusters=4, random_state=42)
@@ -203,7 +142,7 @@ df_cluster = df_full.groupby("cluster").agg("mean")
 # Show elbow plot
 st.subheader("Elbow Plot for Optimal Clusters")
 st.write("Defining how many clusters to choose can be a bit more art than science. The elbow plot compares the number of segments and model inertia.")
-plot_elbow(df_full)
+plot_elbow(df_scaled)
 
 # Show cluster averages
 st.subheader("Cluster Feature Averages")
