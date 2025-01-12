@@ -22,7 +22,7 @@ st.markdown("""
 st.title("Bank Customer Segmentation")
 st.write("""Using a banks dataset, we can segment the customers into different groups based on their characteristics. 
 Once we have a segmentation, we achieve the following benefits:
-1. Have a set of based based actions, such as which products to offer
+1. Have a set of actions to improve customer service and maxmize our revenue/profits
 2. Use the Kmeans algorithm to predict which segment a NEW customer belongs to by manually inputting feature values.""")
 
 # Load and preprocess data
@@ -47,22 +47,15 @@ def preprocess_data(df):
     # Drop initial columns
     df = df.drop(columns=["RowNumber", "CustomerId", "Surname"])
     
-    # Get binary columns before dummies conversion
-    binary_cols = ["HasCrCard", "Exited", "Complain", "IsActiveMember"]
-    
-    # Convert to dummies first time
-    df = pd.get_dummies(df, drop_first=True)
-    
-    # Drop specified columns
-    df = df.drop(columns=["Geography_Spain", "Geography_Germany", "Satisfaction Score",
-                         "Card Type_PLATINUM", "Card Type_SILVER", "Card Type_GOLD"])
-    
-    # Convert to dummies second time and convert to int
-    df = pd.get_dummies(df, drop_first=True).astype(int)
-    
-    # Define continuous and categorical columns
+    # Define our feature sets
     conts = ["CreditScore", "Age", "Tenure", "Balance", "NumOfProducts", "EstimatedSalary", "Point Earned"]
-    cats = [col for col in df.columns if col not in conts + binary_cols]
+    binary_cols = ["HasCrCard", "Exited", "Complain"]
+    cats = ["Gender_Male"]
+    
+    # Convert to dummies and keep only what we need
+    df = pd.get_dummies(df, drop_first=True)
+    all_needed_cols = conts + binary_cols + cats
+    df = df[all_needed_cols]
     
     # Scale continuous variables
     df_conts = df[conts]
@@ -211,7 +204,10 @@ df_cluster = df_full.groupby("cluster").agg("mean")
 st.subheader("Elbow Plot for Optimal Clusters")
 st.write("Defining how many clusters to choose can be a bit more art than science. The elbow plot compares the number of segments and model inertia.")
 st.write("Analyzing the plot requires looking for a pivot point where after a steep decrease, there are diminishing returns for loss of inertia. I see no obvious elbow here, although an argument could be made for 2. However, and this is more art than science, I think 4 is a reasonable choice as it provides a decent decrease in inertia and creates a decent amount of cluster segments that are easily discernable and provide unique characterisicts")
-plot_elbow(df_full)
+
+# Create scaled data for elbow plot
+df_for_elbow = df_full.drop(columns=['cluster'] if 'cluster' in df_full.columns else [])
+plot_elbow(df_for_elbow)
 
 # Show cluster averages
 st.subheader("Cluster Feature Averages")
@@ -351,4 +347,3 @@ if st.sidebar.button("Predict Segment"):
     recommendations = get_segment_recommendations(predicted_cluster)
     for rec in recommendations:
         st.sidebar.write(f"• {rec}")
-
