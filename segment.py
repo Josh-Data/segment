@@ -8,6 +8,16 @@ import matplotlib.pyplot as plt
 # Page config
 st.set_page_config(page_title="Bank Customer Segmentation", layout="wide")
 
+# Set page background color
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #2D3748;
+        color: white;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 # Title and introduction
 st.title("Bank Customer Segmentation")
 st.write("""Using a banks dataset, we can segment the customers into different groups based on their characteristics. 
@@ -63,18 +73,21 @@ def preprocess_data(df):
     
     return df_full, scaler, conts, df_scaled
 
-st.write('''Key Features in the Dataset:
-CreditScore: A numerical representation of creditworthiness.
-Age: Customer's age.
-Tenure: Number of years the customer has been with the bank.
-Balance: The account balance of the customer.
-NumOfProducts: Number of products the customer has purchased.
-HasCrCard: Indicates whether the customer has a credit card (1 = Yes, 0 = No).
-EstimatedSalary: Customer's estimated salary.
-Point Earned: Loyalty points earned by the customer.
-Exited: Indicates whether the customer left the bank (1 = Yes, 0 = No).
-Complain: Indicates whether the customer lodged complaints (1 = Yes, 0 = No).
-Gender_Male: Binary variable indicating gender (1 = Male, 0 = Female).''')
+st.markdown("""
+# Key Features in the Dataset:
+
+* **CreditScore**: A numerical representation of creditworthiness
+* **Age**: Customer's age
+* **Tenure**: Number of years the customer has been with the bank
+* **Balance**: The account balance of the customer
+* **NumOfProducts**: Number of products the customer has purchased
+* **HasCrCard**: Indicates whether the customer has a credit card (1 = Yes, 0 = No)
+* **EstimatedSalary**: Customer's estimated salary
+* **Point Earned**: Loyalty points earned by the customer
+* **Exited**: Indicates whether the customer left the bank (1 = Yes, 0 = No)
+* **Complain**: Indicates whether the customer lodged complaints (1 = Yes, 0 = No)
+* **Gender_Male**: Binary variable indicating gender (1 = Male, 0 = Female)
+""")
 
 # Calculate and show feature variances
 st.subheader("Feature Variance Analysis")
@@ -203,136 +216,105 @@ try:
 except FileNotFoundError:
     st.error("Heatmap image not found. Please ensure 'heatmap.png' is in the same directory as the app.")
     
-    
-st.subheader("Customer Segment Analysis")
-st.write('''Cluster 0 - New Multi-Product Users:
+# Customer Segment Analysis
+st.markdown("""
+## Cluster 0 - New Multi-Product Users
 
-Balance Growth Initiative
+### Balance Growth Initiative
+* Implement tiered interest rates based on balance milestones
+* Create automated savings programs with bonus incentives
+* Offer balance transfer promotions with competitive rates
+* Develop "save to earn" programs linking spending to savings
 
-Implement tiered interest rates based on balance milestones
-Create automated savings programs with bonus incentives
-Offer balance transfer promotions with competitive rates
-Develop "save to earn" programs linking spending to savings
+### Early Retention Strategy
+* Schedule 3-month and 6-month relationship review meetings
+* Provide complimentary financial planning sessions
+* Create early-stage customer feedback loops
+* Implement predictive churn analytics for early intervention
 
+### Digital Engagement Enhancement
+* Push mobile banking app adoption with rewards
+* Gamify financial literacy through app-based learning
+* Create personalized digital onboarding journeys
+* Implement smart notification systems for product usage
 
-Early Retention Strategy
+## Cluster 1 - High-Value Engaged Customers
 
-Schedule 3-month and 6-month relationship review meetings
-Provide complimentary financial planning sessions
-Create early-stage customer feedback loops
-Implement predictive churn analytics for early intervention
+### Premium Service Enhancement
+* Launch exclusive VIP banking services
+* Provide dedicated relationship managers
+* Create invitation-only events and networking opportunities
+* Offer premium card upgrades with enhanced benefits
 
+### Product Diversification
+* Develop tailored investment products
+* Create bundled services with preferential pricing
+* Introduce exclusive insurance products
+* Offer specialized lending solutions
 
-Digital Engagement Enhancement
+### Value Multiplication
+* Design multi-product loyalty bonuses
+* Create referral programs with premium rewards
+* Implement family banking packages
+* Develop cross-border banking solutions
 
-Push mobile banking app adoption with rewards
-Gamify financial literacy through app-based learning
-Create personalized digital onboarding journeys
-Implement smart notification systems for product usage")  
+## Cluster 2 - Loyal Low-Balance Customers
 
+### Balance Growth Programs
+* Create loyalty-based balance incentives
+* Implement automated micro-savings features
+* Develop round-up savings programs
+* Offer special term deposit rates for tenure milestones
 
-Cluster 1 - High-Value Engaged Customers:
+### Product Optimization
+* Conduct product utilization analysis
+* Streamline product portfolio for cost efficiency
+* Create bundle discounts based on tenure
+* Implement usage-based fee reductions
 
-Premium Service Enhancement
+### Relationship Deepening
+* Schedule annual financial health checks
+* Provide tenure-based rewards and recognition
+* Create family member referral programs
+* Develop community banking initiatives
 
-Launch exclusive VIP banking services
-Provide dedicated relationship managers
-Create invitation-only events and networking opportunities
-Offer premium card upgrades with enhanced benefits
+## Cluster 3 - High-Balance Low-Engagement
 
+### Engagement Activation
+* Launch personalized rewards programs
+* Create high-value transaction incentives
+* Implement dynamic point multiplication schemes
+* Develop exclusive lifestyle partnerships
 
-Product Diversification
+### Digital Adoption
+* Provide one-on-one digital banking tutorials
+* Create digital banking incentives
+* Implement smart banking features
+* Develop digital wealth management tools
 
-Develop tailored investment products
-Create bundled services with preferential pricing
-Introduce exclusive insurance products
-Offer specialized lending solutions
+### Product Education
+* Create personalized product discovery journeys
+* Implement AI-driven product recommendations
+* Develop educational webinars and content
+* Offer product usage incentives
 
+## Implementation Timeline
 
-Value Multiplication
+### Immediate (1-3 months)
+* Launch digital engagement initiatives
+* Implement basic rewards programs
+* Start personalized communication campaigns
 
-Design multi-product loyalty bonuses
-Create referral programs with premium rewards
-Implement family banking packages
-Develop cross-border banking solutions
- 
+### Medium-term (3-6 months)
+* Develop and roll out new products
+* Implement technology solutions
+* Train staff on new initiatives
 
-Cluster 2 - Loyal Low-Balance Customers:
-
-Balance Growth Programs
-
-Create loyalty-based balance incentives
-Implement automated micro-savings features
-Develop round-up savings programs
-Offer special term deposit rates for tenure milestones
-
-
-Product Optimization
-
-Conduct product utilization analysis
-Streamline product portfolio for cost efficiency
-Create bundle discounts based on tenure
-Implement usage-based fee reductions
-
-
-Relationship Deepening
-
-Schedule annual financial health checks
-Provide tenure-based rewards and recognition
-Create family member referral programs
-Develop community banking initiatives
-
-
-Cluster 3 - High-Balance Low-Engagement:
-
-Engagement Activation
-
-Launch personalized rewards programs
-Create high-value transaction incentives
-Implement dynamic point multiplication schemes
-Develop exclusive lifestyle partnerships
-
-
-Digital Adoption
-
-Provide one-on-one digital banking tutorials
-Create digital banking incentives
-Implement smart banking features
-Develop digital wealth management tools
-
-
-Product Education
-
-Create personalized product discovery journeys
-Implement AI-driven product recommendations
-Develop educational webinars and content
-Offer product usage incentives
-
-
-Implementation Timeline:
-
-Immediate (1-3 months):
-
-Launch digital engagement initiatives
-Implement basic rewards programs
-Start personalized communication campaigns
-
-
-Medium-term (3-6 months):
-
-Develop and roll out new products
-Implement technology solutions
-Train staff on new initiatives
-
-
-Long-term (6-12 months):
-
-Launch premium services
-Implement advanced analytics
-Develop comprehensive loyalty programs''')
-
-
-    
+### Long-term (6-12 months)
+* Launch premium services
+* Implement advanced analytics
+* Develop comprehensive loyalty programs
+""")
 
 # Predict segment for new customer
 st.sidebar.subheader("Predict Customer Segment")
