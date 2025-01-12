@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
-import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Page config
@@ -85,12 +84,6 @@ def plot_elbow(df_scaled):
     
     st.pyplot(fig)
 
-# Heatmap
-def plot_heatmap(df_cluster):
-    fig, ax = plt.subplots(figsize=(10, 8))
-    sns.heatmap(df_cluster, cmap="coolwarm", annot=True, fmt=".2f")
-    st.pyplot(fig)
-
 # Segment predictor
 def get_segment_recommendations(cluster):
     recommendations = {
@@ -149,10 +142,13 @@ st.subheader("Cluster Feature Averages")
 st.write("Average feature values for each cluster:")
 st.dataframe(df_cluster)
 
-# Show heatmap
+# Show heatmap from saved image
 st.subheader("Cluster Heatmap")
 st.write("Heatmap visualization of cluster characteristics:")
-plot_heatmap(df_cluster)
+try:
+    st.image("heatmap.png", use_column_width=True)
+except FileNotFoundError:
+    st.error("Heatmap image not found. Please ensure 'heatmap.png' is in the same directory as the app.")
 
 # Predict segment for new customer
 st.sidebar.subheader("Predict Customer Segment")
