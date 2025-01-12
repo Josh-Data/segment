@@ -70,10 +70,36 @@ st.write("After deleting un-needed columns, we can check the variance of each fe
 # Prepare data for variance analysis
 df_variance_calc = df_raw.copy()
 df_variance_calc = df_variance_calc.dropna()
-df_variance_calc = df_variance_calc.drop(columns=["RowNumber", "CustomerId", "Surname"])
+df_variance_calc = df_variance_calc.drop(columns=["RowNumber", "CustomerId", "Surname", "Unnamed: 0"])
 df_variance_calc = pd.get_dummies(df_variance_calc, drop_first=True)
 variance_series = df_variance_calc.var().sort_values(ascending=False)
 st.dataframe(variance_series)
+
+st.write("""We can see above that some of the similar products such as card type all have similar variance so can be eliminated, 
+as it won't help to differentiate between the segments.""")
+
+# Show scaled data preview
+st.subheader("Value Standardization via scaling")
+st.write("""Now that we have the relevant features chosen, we need to standardize the values. This prevents large values such as 
+the estimated salary column from overpowering the smaller numerical features like number of products. The scaled dataset will 
+keep the same differential representations per feature column, but will allow the model to operate more effectively. 
+The first five rows of the scaled data frame can be seen below:""")
+
+# Display scaled data preview
+df_preview = df_raw.copy()
+df_preview = df_preview.dropna()
+df_preview = df_preview.drop(columns=["RowNumber", "CustomerId", "Surname"])
+df_preview = pd.get_dummies(df_preview, drop_first=True)
+
+conts = ["CreditScore", "Age", "Tenure", "Balance", "NumOfProducts", "HasCrCard", "EstimatedSalary", "Point Earned"]
+df_conts = df_preview[conts]
+df_binary = df_preview.drop(columns=conts)
+
+scaler = StandardScaler()
+df_scaled = scaler.fit_transform(df_conts)
+df_scaled = pd.DataFrame(df_scaled, columns=conts)
+df_full_preview = pd.concat([df_scaled, df_binary], axis=1)
+st.dataframe(df_full_preview.head())
 
 # Elbow plot
 def plot_elbow(df_scaled):
