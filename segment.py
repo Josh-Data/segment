@@ -173,7 +173,7 @@ def get_user_input(conts, binary_cols, cats, feature_means):
             help=f"Average value: {int(mean_value)}"
         )
     
-    st.sidebar.subheader("Binary Features (0 or 1)")
+    st.sidebar.subheader("0 = No, 1 = Yes")
     for feature in binary_cols:
         user_input[feature] = st.sidebar.selectbox(
             f"Select {feature}",
@@ -181,7 +181,7 @@ def get_user_input(conts, binary_cols, cats, feature_means):
             help="0 = No, 1 = Yes"
         )
     
-    st.sidebar.subheader("Categorical Features")
+    st.sidebar.subheader("0 = Female, 1 = Male")
     for feature in cats:
         user_input[feature] = st.sidebar.selectbox(
             f"Select {feature}",
