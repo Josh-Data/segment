@@ -63,6 +63,12 @@ def preprocess_data(df):
     
     return df_full, scaler, conts, df_scaled
 
+# Calculate and show feature variances
+st.subheader("Feature Variance Analysis")
+st.write("After deleting un-needed columns, we can check the variance of each feature to get a better understanding of which columns will be truly helpful in segmentation.")
+df_variance = df_raw.drop(columns=["RowNumber", "CustomerId", "Surname"]).var().sort_values(ascending=False)
+st.dataframe(df_variance)
+
 # Elbow plot
 def plot_elbow(df_scaled):
     clusters = range(1, 10)
