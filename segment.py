@@ -47,22 +47,26 @@ def preprocess_data(df):
     # Drop initial columns
     df = df.drop(columns=["RowNumber", "CustomerId", "Surname"])
     
+    # Get binary columns before dummies conversion
+    binary_cols = ["HasCrCard", "Exited", "Complain", "IsActiveMember"]
+    
     # Convert to dummies first time
     df = pd.get_dummies(df, drop_first=True)
     
     # Drop specified columns
     df = df.drop(columns=["Geography_Spain", "Geography_Germany", "Satisfaction Score",
-                         "Card Type_PLATINUM", "Card Type_SILVER", "Card Type_GOLD", 
-                         "IsActiveMember"])
+                         "Card Type_PLATINUM", "Card Type_SILVER", "Card Type_GOLD"])
     
     # Convert to dummies second time and convert to int
     df = pd.get_dummies(df, drop_first=True).astype(int)
     
+    # Define continuous and categorical columns
+    conts = ["CreditScore", "Age", "Tenure", "Balance", "NumOfProducts", "EstimatedSalary", "Point Earned"]
+    cats = [col for col in df.columns if col not in conts + binary_cols]
+    
     # Scale continuous variables
-    conts = ["CreditScore", "Age", "Tenure", "Balance", "NumOfProducts", 
-             "HasCrCard", "EstimatedSalary", "Point Earned"]
     df_conts = df[conts]
-    df_binary = df.drop(columns=conts)
+    df_binary = df[binary_cols + cats]
     
     scaler = StandardScaler()
     df_scaled = scaler.fit_transform(df_conts)
@@ -71,7 +75,7 @@ def preprocess_data(df):
     # Combine scaled continuous and binary variables
     df_full = pd.concat([df_scaled, df_binary], axis=1)
     
-    return df_full, scaler, conts, df_scaled
+    return df_full, scaler, conts, binary_cols, cats, df_conts.mean()
 
 st.markdown("""
 # Key Features in the Dataset:
@@ -111,22 +115,6 @@ the estimated salary column from overpowering the smaller numerical features lik
 keep the same differential representations per feature column, but will allow the model to operate more effectively. 
 The first five rows of the scaled data frame can be seen below:""")
 
-# Display scaled data preview
-df_preview = df_raw.copy()
-df_preview = df_preview.dropna()
-df_preview = df_preview.drop(columns=["RowNumber", "CustomerId", "Surname"])
-df_preview = pd.get_dummies(df_preview, drop_first=True)
-
-conts = ["CreditScore", "Age", "Tenure", "Balance", "NumOfProducts", "HasCrCard", "EstimatedSalary", "Point Earned"]
-df_conts = df_preview[conts]
-df_binary = df_preview.drop(columns=conts)
-
-scaler = StandardScaler()
-df_scaled = scaler.fit_transform(df_conts)
-df_scaled = pd.DataFrame(df_scaled, columns=conts)
-df_full_preview = pd.concat([df_scaled, df_binary], axis=1)
-st.dataframe(df_full_preview.head())
-
 # Elbow plot
 def plot_elbow(df_scaled):
     clusters = range(1, 10)
@@ -147,8 +135,6 @@ def plot_elbow(df_scaled):
     plt.ticklabel_format(style='plain', axis='y')
     
     st.pyplot(fig)
-    
-st.write("Analyzing the plot requires looking for a pivot point where after a steep decrease, there are diminishing returns for loss of inertia. I see no obvious elbow here, although an argument could be made for 2. However, and this is more art than science, I think 4 is a reasonable choice as it provides a decent decrease in inertia and creates a decent amount of cluster segments that are easily discernable and provide unique characterisicts")
 
 # Segment predictor
 def get_segment_recommendations(cluster):
@@ -180,17 +166,39 @@ def get_segment_recommendations(cluster):
     }
     return recommendations[cluster]
 
-# Sidebar for user input
-st.sidebar.header("Input Customer Features")
-
-def get_user_input(conts):
+# Sidebar for user input with non-scaled mean values
+def get_user_input(conts, binary_cols, cats, feature_means):
     user_input = {}
+    
+    st.sidebar.subheader("Continuous Features")
     for feature in conts:
-        user_input[feature] = st.sidebar.number_input(f"Enter {feature}", value=0.0)
+        mean_value = feature_means[feature]
+        user_input[feature] = st.sidebar.number_input(
+            f"Enter {feature}", 
+            value=float(mean_value),
+            help=f"Average value: {mean_value:.2f}"
+        )
+    
+    st.sidebar.subheader("Binary Features (0 or 1)")
+    for feature in binary_cols:
+        user_input[feature] = st.sidebar.selectbox(
+            f"Select {feature}",
+            options=[0, 1],
+            help="0 = No, 1 = Yes"
+        )
+    
+    st.sidebar.subheader("Categorical Features")
+    for feature in cats:
+        user_input[feature] = st.sidebar.selectbox(
+            f"Select {feature}",
+            options=[0, 1],
+            help="0 = No, 1 = Yes"
+        )
+    
     return pd.DataFrame([user_input])
 
 # Main app logic
-df_full, scaler, conts, df_scaled = preprocess_data(df_raw)
+df_full, scaler, conts, binary_cols, cats, feature_means = preprocess_data(df_raw)
 
 # Train KMeans model
 model = KMeans(n_clusters=4, random_state=42)
@@ -201,7 +209,8 @@ df_cluster = df_full.groupby("cluster").agg("mean")
 # Show elbow plot
 st.subheader("Elbow Plot for Optimal Clusters")
 st.write("Defining how many clusters to choose can be a bit more art than science. The elbow plot compares the number of segments and model inertia.")
-plot_elbow(df_scaled)
+st.write("Analyzing the plot requires looking for a pivot point where after a steep decrease, there are diminishing returns for loss of inertia. I see no obvious elbow here, although an argument could be made for 2. However, and this is more art than science, I think 4 is a reasonable choice as it provides a decent decrease in inertia and creates a decent amount of cluster segments that are easily discernable and provide unique characterisicts")
+plot_elbow(df_full)
 
 # Show cluster averages
 st.subheader("Cluster Feature Averages")
@@ -215,7 +224,9 @@ try:
     st.image("heatmap.png", use_column_width=True)
 except FileNotFoundError:
     st.error("Heatmap image not found. Please ensure 'heatmap.png' is in the same directory as the app.")
-    
+
+st.write(''' Now that we can see the clear differences between each segment, we can use this information to strategize about how to treat each customer segment, examples below:''')
+
 # Customer Segment Analysis
 st.markdown("""
 ## Cluster 0 - New Multi-Product Users
@@ -318,14 +329,19 @@ st.markdown("""
 
 # Predict segment for new customer
 st.sidebar.subheader("Predict Customer Segment")
-user_input = get_user_input(conts)
+user_input = get_user_input(conts, binary_cols, cats, feature_means)
 
 if st.sidebar.button("Predict Segment"):
-    # Scale the user input
-    scaled_input = scaler.transform(user_input)
+    # Scale only the continuous features
+    cont_input = user_input[conts]
+    scaled_cont_input = scaler.transform(cont_input)
+    
+    # Replace the continuous features with their scaled versions
+    prediction_input = user_input.copy()
+    prediction_input[conts] = scaled_cont_input
     
     # Predict cluster
-    predicted_cluster = model.predict(scaled_input)[0]
+    predicted_cluster = model.predict(prediction_input)[0]
     
     st.sidebar.write(f"Predicted Segment: Cluster {predicted_cluster}")
     
