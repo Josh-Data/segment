@@ -175,8 +175,9 @@ def get_user_input(conts, binary_cols, cats, feature_means):
         mean_value = feature_means[feature]
         user_input[feature] = st.sidebar.number_input(
             f"Enter {feature}", 
-            value=float(mean_value),
-            help=f"Average value: {mean_value:.2f}"
+            value=int(mean_value),
+            step=1,
+            help=f"Average value: {int(mean_value)}"
         )
     
     st.sidebar.subheader("Binary Features (0 or 1)")
@@ -350,3 +351,4 @@ if st.sidebar.button("Predict Segment"):
     recommendations = get_segment_recommendations(predicted_cluster)
     for rec in recommendations:
         st.sidebar.write(f"• {rec}")
+
