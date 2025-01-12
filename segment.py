@@ -228,7 +228,7 @@ st.write(''' Now that we can see the clear differences between each segment, we 
 # Customer Segment Analysis
 st.markdown("""
 ## Cluster 0 - New Multi-Product Users
-#### Interpretation: This cluster may consist of older, wealthier customers with fewer products and a higher tendency to churn, despite having high loyalty points.
+#### Interpretation: This cluster could represent newer customers with low balances but a higher interest in products. They may be slightly dissatisfied and prone to leaving.
 
 ### Balance Growth Initiative
 * Implement tiered interest rates based on balance milestones
@@ -249,6 +249,9 @@ st.markdown("""
 * Implement smart notification systems for product usage
 
 ## Cluster 1 - High-Value Engaged Customers
+#### Interpretation: This cluster may consist of older, wealthier customers with fewer products and a higher tendency to churn, despite having high loyalty points.
+
+
 
 ### Premium Service Enhancement
 * Launch exclusive VIP banking services
@@ -269,6 +272,7 @@ st.markdown("""
 * Develop cross-border banking solutions
 
 ## Cluster 2 - Loyal Low-Balance Customers
+#### Interpretation: This cluster might represent loyal, long-tenure customers with low balances but a high interest in the bank's products. They have low churn rates and are relatively satisfied.
 
 ### Balance Growth Programs
 * Create loyalty-based balance incentives
@@ -289,6 +293,7 @@ st.markdown("""
 * Develop community banking initiatives
 
 ## Cluster 3 - High-Balance Low-Engagement
+#### Interpretation: This cluster could include customers with high balances but low loyalty points and fewer products. They may be dissatisfied and more likely to churn.
 
 ### Engagement Activation
 * Launch personalized rewards programs
