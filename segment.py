@@ -329,7 +329,7 @@ Long-term (6-12 months):
 
 Launch premium services
 Implement advanced analytics
-Develop comprehensive loyalty programs'''
+Develop comprehensive loyalty programs''')
 
 
     
