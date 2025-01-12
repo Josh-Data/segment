@@ -228,6 +228,7 @@ st.write(''' Now that we can see the clear differences between each segment, we 
 # Customer Segment Analysis
 st.markdown("""
 ## Cluster 0 - New Multi-Product Users
+#### Interpretation: This cluster may consist of older, wealthier customers with fewer products and a higher tendency to churn, despite having high loyalty points.
 
 ### Balance Growth Initiative
 * Implement tiered interest rates based on balance milestones
