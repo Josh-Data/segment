@@ -40,7 +40,7 @@ df_raw = load_data()
 
 # Show raw data
 st.subheader("Raw Data Preview")
-st.write("Here are the first few rows of the raw dataframe. We can see right away there are some irrelevant columns that we can drop such as RowNumber, CustomerID, and Surname.")
+st.write("Here are the first few rows of the raw dataframe. We can see right away there are some irrelevant columns that we can drop such as Unnamed 0,  RowNumber, CustomerID, and Surname.")
 st.dataframe(df_raw.head())
 
 def preprocess_data(df):
