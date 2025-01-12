@@ -159,7 +159,6 @@ def get_segment_recommendations(cluster):
     }
     return recommendations[cluster]
 
-# Sidebar for user input with non-scaled mean values
 def get_user_input(conts, binary_cols, cats, feature_means):
     user_input = {}
     
@@ -173,20 +172,22 @@ def get_user_input(conts, binary_cols, cats, feature_means):
             help=f"Average value: {int(mean_value)}"
         )
     
-    st.sidebar.subheader("0 = No, 1 = Yes")
+    st.sidebar.subheader("Binary Features (0 or 1)")
     for feature in binary_cols:
         user_input[feature] = st.sidebar.selectbox(
             f"Select {feature}",
             options=[0, 1],
+            format_func=lambda x: "No" if x == 0 else "Yes",
             help="0 = No, 1 = Yes"
         )
     
-    st.sidebar.subheader("0 = Female, 1 = Male")
+    st.sidebar.subheader("Categorical Features")
     for feature in cats:
         user_input[feature] = st.sidebar.selectbox(
             f"Select {feature}",
             options=[0, 1],
-            help="0 = No, 1 = Yes"
+            format_func=lambda x: "Female" if x == 0 else "Male",
+            help="0 = Female, 1 = Male"
         )
     
     return pd.DataFrame([user_input])
