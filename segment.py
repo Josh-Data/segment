@@ -313,23 +313,7 @@ st.markdown("""
 * Develop educational webinars and content
 * Offer product usage incentives
 
-## Implementation Timeline
 
-### Immediate (1-3 months)
-* Launch digital engagement initiatives
-* Implement basic rewards programs
-* Start personalized communication campaigns
-
-### Medium-term (3-6 months)
-* Develop and roll out new products
-* Implement technology solutions
-* Train staff on new initiatives
-
-### Long-term (6-12 months)
-* Launch premium services
-* Implement advanced analytics
-* Develop comprehensive loyalty programs
-""")
 
 # Predict segment for new customer
 st.sidebar.subheader("Predict Customer Segment")
