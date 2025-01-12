@@ -66,8 +66,14 @@ def preprocess_data(df):
 # Calculate and show feature variances
 st.subheader("Feature Variance Analysis")
 st.write("After deleting un-needed columns, we can check the variance of each feature to get a better understanding of which columns will be truly helpful in segmentation.")
-df_variance = df_raw.drop(columns=["RowNumber", "CustomerId", "Surname"]).var().sort_values(ascending=False)
-st.dataframe(df_variance)
+
+# Prepare data for variance analysis
+df_variance_calc = df_raw.copy()
+df_variance_calc = df_variance_calc.dropna()
+df_variance_calc = df_variance_calc.drop(columns=["RowNumber", "CustomerId", "Surname"])
+df_variance_calc = pd.get_dummies(df_variance_calc, drop_first=True)
+variance_series = df_variance_calc.var().sort_values(ascending=False)
+st.dataframe(variance_series)
 
 # Elbow plot
 def plot_elbow(df_scaled):
