@@ -63,6 +63,19 @@ def preprocess_data(df):
     
     return df_full, scaler, conts, df_scaled
 
+st.write('''Key Features in the Dataset:
+CreditScore: A numerical representation of creditworthiness.
+Age: Customer's age.
+Tenure: Number of years the customer has been with the bank.
+Balance: The account balance of the customer.
+NumOfProducts: Number of products the customer has purchased.
+HasCrCard: Indicates whether the customer has a credit card (1 = Yes, 0 = No).
+EstimatedSalary: Customer's estimated salary.
+Point Earned: Loyalty points earned by the customer.
+Exited: Indicates whether the customer left the bank (1 = Yes, 0 = No).
+Complain: Indicates whether the customer lodged complaints (1 = Yes, 0 = No).
+Gender_Male: Binary variable indicating gender (1 = Male, 0 = Female).''')
+
 # Calculate and show feature variances
 st.subheader("Feature Variance Analysis")
 st.write("After deleting un-needed columns, we can check the variance of each feature to get a better understanding of which columns will be truly helpful in segmentation.")
@@ -121,6 +134,8 @@ def plot_elbow(df_scaled):
     plt.ticklabel_format(style='plain', axis='y')
     
     st.pyplot(fig)
+    
+st.write("Analyzing the plot requires looking for a pivot point where after a steep decrease, there are diminishing returns for loss of inertia. I see no obvious elbow here, although an argument could be made for 2. However, and this is more art than science, I think 4 is a reasonable choice as it provides a decent decrease in inertia and creates a decent amount of cluster segments that are easily discernable and provide unique characterisicts")
 
 # Segment predictor
 def get_segment_recommendations(cluster):
@@ -177,16 +192,147 @@ plot_elbow(df_scaled)
 
 # Show cluster averages
 st.subheader("Cluster Feature Averages")
-st.write("Average feature values for each cluster:")
+st.write("After choosing 4 segments, we run the model and assign each customer a cluster. Then we can take the average feature values for each cluster, as seen below:")
 st.dataframe(df_cluster)
 
 # Show heatmap from saved image
 st.subheader("Cluster Heatmap")
-st.write("Heatmap visualization of cluster characteristics:")
+st.write("The cluster averages can be better seen via a correlation heat map")
 try:
     st.image("heatmap.png", use_column_width=True)
 except FileNotFoundError:
     st.error("Heatmap image not found. Please ensure 'heatmap.png' is in the same directory as the app.")
+    
+    
+st.subheader("Customer Segment Analysis")
+st.write('''Cluster 0 - New Multi-Product Users:
+
+Balance Growth Initiative
+
+Implement tiered interest rates based on balance milestones
+Create automated savings programs with bonus incentives
+Offer balance transfer promotions with competitive rates
+Develop "save to earn" programs linking spending to savings
+
+
+Early Retention Strategy
+
+Schedule 3-month and 6-month relationship review meetings
+Provide complimentary financial planning sessions
+Create early-stage customer feedback loops
+Implement predictive churn analytics for early intervention
+
+
+Digital Engagement Enhancement
+
+Push mobile banking app adoption with rewards
+Gamify financial literacy through app-based learning
+Create personalized digital onboarding journeys
+Implement smart notification systems for product usage")  
+
+
+Cluster 1 - High-Value Engaged Customers:
+
+Premium Service Enhancement
+
+Launch exclusive VIP banking services
+Provide dedicated relationship managers
+Create invitation-only events and networking opportunities
+Offer premium card upgrades with enhanced benefits
+
+
+Product Diversification
+
+Develop tailored investment products
+Create bundled services with preferential pricing
+Introduce exclusive insurance products
+Offer specialized lending solutions
+
+
+Value Multiplication
+
+Design multi-product loyalty bonuses
+Create referral programs with premium rewards
+Implement family banking packages
+Develop cross-border banking solutions
+ 
+
+Cluster 2 - Loyal Low-Balance Customers:
+
+Balance Growth Programs
+
+Create loyalty-based balance incentives
+Implement automated micro-savings features
+Develop round-up savings programs
+Offer special term deposit rates for tenure milestones
+
+
+Product Optimization
+
+Conduct product utilization analysis
+Streamline product portfolio for cost efficiency
+Create bundle discounts based on tenure
+Implement usage-based fee reductions
+
+
+Relationship Deepening
+
+Schedule annual financial health checks
+Provide tenure-based rewards and recognition
+Create family member referral programs
+Develop community banking initiatives
+
+
+Cluster 3 - High-Balance Low-Engagement:
+
+Engagement Activation
+
+Launch personalized rewards programs
+Create high-value transaction incentives
+Implement dynamic point multiplication schemes
+Develop exclusive lifestyle partnerships
+
+
+Digital Adoption
+
+Provide one-on-one digital banking tutorials
+Create digital banking incentives
+Implement smart banking features
+Develop digital wealth management tools
+
+
+Product Education
+
+Create personalized product discovery journeys
+Implement AI-driven product recommendations
+Develop educational webinars and content
+Offer product usage incentives
+
+
+Implementation Timeline:
+
+Immediate (1-3 months):
+
+Launch digital engagement initiatives
+Implement basic rewards programs
+Start personalized communication campaigns
+
+
+Medium-term (3-6 months):
+
+Develop and roll out new products
+Implement technology solutions
+Train staff on new initiatives
+
+
+Long-term (6-12 months):
+
+Launch premium services
+Implement advanced analytics
+Develop comprehensive loyalty programs'''
+
+
+    
 
 # Predict segment for new customer
 st.sidebar.subheader("Predict Customer Segment")
