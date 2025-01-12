@@ -12,7 +12,7 @@ st.set_page_config(page_title="Bank Customer Segmentation", layout="wide")
 st.markdown("""
     <style>
     .stApp {
-        background-color: #828282;
+        background-color: #404244;
         color: #e0e7ef;
     }
     </style>
