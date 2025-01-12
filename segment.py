@@ -313,7 +313,7 @@ st.markdown("""
 * Develop educational webinars and content
 * Offer product usage incentives
 
-
+""")
 
 # Predict segment for new customer
 st.sidebar.subheader("Predict Customer Segment")
